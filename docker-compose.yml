@@ -7,8 +7,6 @@ services:
     image: interventor:v1
     container_name: interventor
     restart: on-failure
-    depends_on:
-      - mongo
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_APPLICATION_NAME=app-interventor
