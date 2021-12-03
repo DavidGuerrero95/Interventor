@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: interventor:v1
+    container_name: interventor
+    restart: on-failure
+    depends_on:
+      - mongo
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_APPLICATION_NAME=app-interventor
+      - SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=admin
+      - SPRING_DATA_MONGODB_AUTO_INDEX_CREATION=true
+      - SPRING_DATA_MONGODB_HOST=mongo
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_USERNAME=user
+      - SPRING_DATA_MONGODB_PASSWORD=user
+      - SPRING_DATA_MONGODB_DATABASE=interventorApp
+    networks:
+      - appcity
+networks:
+  appcity:
+    external:
+      name: appcity
