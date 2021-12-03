@@ -41,6 +41,6 @@ services:
     networks:
       - appcity
 networks:
-  main-network:
+  appcity:
     external:
       name: $NETWORK_NAME
