@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  mongo:
+    image: mongo:4
+    container_name: mongo
+    hostname: mongo
+    restart: unless-stopped
+    ports:
+      - $MONGO_HOST_PORT:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_ROOT_PASSWORD
+      - MONGO_INITDB_DATABASE=$MONGO_DB
+    volumes:
+      - $MONGO_DATA_HOST_PATH:/data/db/
+      - $MONGO_LOG_HOST_PATH:/var/log/mongodb/
+      - $MONGO_INITDB_SCRIPTS_HOST_PATH:/docker-entrypoint-initdb.d/
+    networks:
+      - appcity
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: interventor:v1
+    container_name: interventor
+    restart: on-failure
+    depends_on:
+      - mongo
+    networks:
+      - appcity
+networks:
+  main-network:
+    external:
+      name: $NETWORK_NAME
