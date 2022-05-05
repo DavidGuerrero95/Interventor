@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,7 +50,7 @@ public class InterventorController {
 	public List<UsuariosInterventor> verUsuarios() {
 		return uRepository.findAll();
 	}
-
+	
 	@GetMapping("/interventor/listarProyectos")
 	@ResponseStatus(code = HttpStatus.OK)
 	public List<ProyectosInterventor> verProyectos() {
@@ -67,6 +68,17 @@ public class InterventorController {
 			return false;
 		throw new IOException("Error en la creacion");
 	}
+	
+	@PutMapping("/interventor/eliminar/peticion/usuario/")
+	@ResponseStatus(code = HttpStatus.OK)
+	public Boolean eliminarPeticionUsuarios(@RequestParam("username") String username) throws IOException {
+		if(uRepository.existsByUsername(username)) {
+			UsuariosInterventor uInterventor = uRepository.findByUsername(username);
+			uRepository.delete(uInterventor);
+		} else if (!uRepository.existsByUsername(username))
+			return false;
+		throw new IOException("Error en la eliminacion de peticion usuario");
+	}
 
 	@PostMapping("/interventor/proyectosEliminar")
 	@ResponseStatus(code = HttpStatus.CREATED)
@@ -78,6 +90,17 @@ public class InterventorController {
 		} else if (uRepository.existsByUsername(nombre))
 			return false;
 		throw new IOException("Error en la creacion");
+	}
+	
+	@PutMapping("/interventor/eliminar/peticion/proyecto/")
+	@ResponseStatus(code = HttpStatus.OK)
+	public Boolean eliminarPeticionProyecto(@RequestParam("nombre") String nombre) throws IOException {
+		if(pRepository.existsByNombre(nombre)) {
+			ProyectosInterventor pInterventor = pRepository.findByNombre(nombre);
+			pRepository.delete(pInterventor);
+		} else if (!pRepository.existsByNombre(nombre))
+			return false;
+		throw new IOException("Error en la eliminacion de peticion proyecto");
 	}
 
 	@DeleteMapping("/interventor/eliminarUsuarioDefinitivamente/")
