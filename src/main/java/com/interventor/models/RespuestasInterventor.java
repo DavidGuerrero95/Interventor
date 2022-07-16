@@ -1,7 +1,6 @@
 package com.interventor.models;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,20 +8,24 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Document(collection = "usuariosInterventor")
+@Document(collection = "respuestasInterventor")
 @Data
 @NoArgsConstructor
-public class UsuariosInterventor {
+public class RespuestasInterventor {
 
 	@Id
 	@JsonIgnore
 	private String id;
 
-	@Indexed(unique = true)
 	private String username;
+	private Integer idProyecto;
+	private Integer formulario;
 
-	public UsuariosInterventor(String username) {
+	public RespuestasInterventor(String username, Integer idProyecto, Integer formulario) {
 		super();
 		this.username = username;
+		this.idProyecto = idProyecto;
+		this.formulario = formulario;
 	}
+	
 }

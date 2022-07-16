@@ -4,37 +4,26 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Document(collection = "proyectosInterventor")
+@Data
+@NoArgsConstructor
 public class ProyectosInterventor {
 
 	@Id
+	@JsonIgnore
 	private String id;
 
 	@Indexed(unique = true)
-	private String nombre;
+	private Integer idProyecto;
 
-	public ProyectosInterventor() {
-	}
-
-	public ProyectosInterventor(String nombre) {
+	public ProyectosInterventor(Integer idProyecto) {
 		super();
-		this.nombre = nombre;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getNombre() {
-		return nombre;
-	}
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
+		this.idProyecto = idProyecto;
 	}
 
 }

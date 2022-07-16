@@ -3,12 +3,9 @@ package com.interventor.controllers;
 import java.io.IOException;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.interventor.clients.ProyectosFeignClient;
 import com.interventor.clients.UsersFeignClient;
@@ -24,10 +22,11 @@ import com.interventor.models.UsuariosInterventor;
 import com.interventor.repository.PInterventorRepository;
 import com.interventor.repository.UInterventorRepository;
 
-@RestController
-public class InterventorController {
+import lombok.extern.slf4j.Slf4j;
 
-	private final Logger logger = LoggerFactory.getLogger(InterventorController.class);
+@RestController
+@Slf4j
+public class InterventorController {
 
 	@SuppressWarnings("rawtypes")
 	@Autowired
@@ -45,20 +44,17 @@ public class InterventorController {
 	@Autowired
 	ProyectosFeignClient pClient;
 
+//  ****************************	USUARIOS 	***********************************  //
+
+	// LISTAR USUARIOS
 	@GetMapping("/interventor/listarUsuarios")
 	@ResponseStatus(code = HttpStatus.OK)
 	public List<UsuariosInterventor> verUsuarios() {
 		return uRepository.findAll();
 	}
-	
-	@GetMapping("/interventor/listarProyectos")
-	@ResponseStatus(code = HttpStatus.OK)
-	public List<ProyectosInterventor> verProyectos() {
-		return pRepository.findAll();
-	}
 
+	// CREAR PETICION
 	@PostMapping("/interventor/usuariosEliminar")
-	@ResponseStatus(code = HttpStatus.CREATED)
 	public Boolean peticionEliminarUsuarios(@RequestParam("username") String username) throws IOException {
 		if (!uRepository.existsByUsername(username)) {
 			UsuariosInterventor uInterventor = new UsuariosInterventor(username);
@@ -68,11 +64,12 @@ public class InterventorController {
 			return false;
 		throw new IOException("Error en la creacion");
 	}
-	
+
+	// ELIMINAR PETICION
 	@PutMapping("/interventor/eliminar/peticion/usuario/")
 	@ResponseStatus(code = HttpStatus.OK)
 	public Boolean eliminarPeticionUsuarios(@RequestParam("username") String username) throws IOException {
-		if(uRepository.existsByUsername(username)) {
+		if (uRepository.existsByUsername(username)) {
 			UsuariosInterventor uInterventor = uRepository.findByUsername(username);
 			uRepository.delete(uInterventor);
 		} else if (!uRepository.existsByUsername(username))
@@ -80,51 +77,70 @@ public class InterventorController {
 		throw new IOException("Error en la eliminacion de peticion usuario");
 	}
 
-	@PostMapping("/interventor/proyectosEliminar")
+	@DeleteMapping("/interventor/eliminarUsuarioDefinitivamente/")
+	public Boolean eliminarUsuario(@RequestParam("username") String username) {
+		UsuariosInterventor uInter = uRepository.findByUsername(username);
+		uRepository.delete(uInter);
+		if (cbFactory.create("interventor").run(() -> uClient.eliminarUsuario(username),
+				e -> errorConexionUsuarios(e))) {
+			return true;
+		}
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El servicio usuarios no disponible");
+	}
+
+//  ****************************	PROYECTOS 	***********************************  //
+
+	// LISTAR PROYECTOS
+	@GetMapping("/interventor/listarProyectos")
+	@ResponseStatus(code = HttpStatus.OK)
+	public List<ProyectosInterventor> verProyectos() {
+		return pRepository.findAll();
+	}
+
+	// CREAER PETICION
+	@PostMapping("/interventor/proyectosEliminar/")
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public Boolean peticionEliminarProyectos(@RequestParam("nombre") String nombre) throws IOException {
-		if (!pRepository.existsByNombre(nombre)) {
-			ProyectosInterventor pInterventor = new ProyectosInterventor(nombre);
+	public Boolean peticionEliminarProyectos(@RequestParam("codigoProyecto") Integer codigoProyecto)
+			throws IOException {
+		if (!pRepository.existsByIdProyecto(codigoProyecto)) {
+			ProyectosInterventor pInterventor = new ProyectosInterventor(codigoProyecto);
 			pRepository.save(pInterventor);
 			return true;
-		} else if (uRepository.existsByUsername(nombre))
+		} else
 			return false;
-		throw new IOException("Error en la creacion");
 	}
-	
+
 	@PutMapping("/interventor/eliminar/peticion/proyecto/")
 	@ResponseStatus(code = HttpStatus.OK)
-	public Boolean eliminarPeticionProyecto(@RequestParam("nombre") String nombre) throws IOException {
-		if(pRepository.existsByNombre(nombre)) {
-			ProyectosInterventor pInterventor = pRepository.findByNombre(nombre);
+	public Boolean eliminarPeticionProyecto(@RequestParam("codigoProyecto") Integer codigoProyecto) throws IOException {
+		if (pRepository.existsByIdProyecto(codigoProyecto)) {
+			ProyectosInterventor pInterventor = pRepository.findByIdProyecto(codigoProyecto);
 			pRepository.delete(pInterventor);
-		} else if (!pRepository.existsByNombre(nombre))
+		} else
 			return false;
 		throw new IOException("Error en la eliminacion de peticion proyecto");
 	}
 
-	@DeleteMapping("/interventor/eliminarUsuarioDefinitivamente/")
-	public ResponseEntity<?> eliminarUsuario(@RequestParam("username") String username) {
-		UsuariosInterventor uInter = uRepository.findByUsername(username);
-		uRepository.delete(uInter);
-		if (cbFactory.create("interventor").run(() -> uClient.eliminarUsuario(username), e -> errorConexion(e))) {
-			return ResponseEntity.ok("Usuario Eliminado Correctamente");
-		}
-		return ResponseEntity.badRequest().body("Error en la eliminacion del usuario");
-	}
-
 	@DeleteMapping("/interventor/eliminarProyectoDefinitivamente/")
-	public ResponseEntity<?> eliminarProyectos(@RequestParam("nombre") String nombre) {
-		ProyectosInterventor pInter = pRepository.findByNombre(nombre);
+	public Boolean eliminarProyectos(@RequestParam("codigoProyecto") Integer codigoProyecto) {
+		ProyectosInterventor pInter = pRepository.findByIdProyecto(codigoProyecto);
 		pRepository.delete(pInter);
-		if (cbFactory.create("interventor").run(() -> pClient.eliminarProyectos(nombre), e -> errorConexion(e))) {
-			return ResponseEntity.ok("Proyecto Eliminado Correctamente");
+		if (cbFactory.create("interventor").run(() -> pClient.eliminarProyectos(codigoProyecto),
+				e -> errorConexionProyectos(e))) {
+			return true;
 		}
-		return ResponseEntity.badRequest().body("Error en la eliminacion del usuario");
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El servicio usuarios no disponible");
 	}
 
-	public Boolean errorConexion(Throwable e) {
-		logger.info(e.getMessage());
+//  ****************************	FUNCIONES TOLERANCIA A FALLOS	***********************************  //
+
+	public Boolean errorConexionUsuarios(Throwable e) {
+		log.info(e.getMessage());
+		return false;
+	}
+
+	public Boolean errorConexionProyectos(Throwable e) {
+		log.info(e.getMessage());
 		return false;
 	}
 }

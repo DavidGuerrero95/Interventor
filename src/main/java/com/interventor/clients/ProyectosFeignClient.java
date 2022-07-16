@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "app-proyectos")
 public interface ProyectosFeignClient {
 
-	@DeleteMapping("/proyectos/eliminar/{nombre}")
-	public Boolean eliminarProyectos(@PathVariable("nombre") String nombre);
+	@DeleteMapping("/proyectos/eliminar/{codigoProyecto}")
+	public Boolean eliminarProyectos(@PathVariable("codigoProyecto") Integer idProyecto);
 
 }

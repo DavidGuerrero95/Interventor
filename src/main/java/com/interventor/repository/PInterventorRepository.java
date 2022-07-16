@@ -6,11 +6,11 @@ import org.springframework.data.rest.core.annotation.RestResource;
 
 import com.interventor.models.ProyectosInterventor;
 
-public interface PInterventorRepository extends MongoRepository<ProyectosInterventor, String>{
+public interface PInterventorRepository extends MongoRepository<ProyectosInterventor, String> {
 
 	@RestResource(path = "find-user")
-	public ProyectosInterventor findByNombre(@Param("nombre") String nombre);
-	
+	public ProyectosInterventor findByIdProyecto(@Param("idProyecto") Integer idProyecto);
+
 	@RestResource(path = "exist-user")
-	public Boolean existsByNombre(@Param("nombre") String nombre);
+	public Boolean existsByIdProyecto(@Param("idProyecto") Integer idProyecto);
 }
