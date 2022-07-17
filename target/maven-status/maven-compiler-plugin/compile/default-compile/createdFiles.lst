@@ -1,6 +1,7 @@
 com\interventor\clients\UsersFeignClient.class
 com\interventor\models\UsuariosInterventor.class
 com\interventor\models\ProyectosInterventor.class
+com\interventor\models\RespuestasInterventor.class
 com\interventor\repository\UInterventorRepository.class
 com\interventor\InterventorApplication.class
 com\interventor\repository\PInterventorRepository.class

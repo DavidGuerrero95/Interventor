@@ -114,14 +114,13 @@ public class InterventorController {
 	@ResponseStatus(code = HttpStatus.OK)
 	public Boolean eliminarPeticionProyecto(@RequestParam("codigoProyecto") Integer codigoProyecto) throws IOException {
 		if (pRepository.existsByIdProyecto(codigoProyecto)) {
-			ProyectosInterventor pInterventor = pRepository.findByIdProyecto(codigoProyecto);
-			pRepository.delete(pInterventor);
+			pRepository.deleteByIdProyecto(codigoProyecto);
 		} else
 			return false;
 		throw new IOException("Error en la eliminacion de peticion proyecto");
 	}
 
-	@DeleteMapping("/interventor/eliminarProyectoDefinitivamente/")
+	@DeleteMapping("	")
 	public Boolean eliminarProyectos(@RequestParam("codigoProyecto") Integer codigoProyecto) {
 		ProyectosInterventor pInter = pRepository.findByIdProyecto(codigoProyecto);
 		pRepository.delete(pInter);

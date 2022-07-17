@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface ProyectosFeignClient {
 
 	@DeleteMapping("/proyectos/eliminar/{codigoProyecto}")
-	public Boolean eliminarProyectos(@PathVariable("codigoProyecto") Integer idProyecto);
+	public Boolean eliminarProyectos(@PathVariable("codigoProyecto") Integer codigoProyecto);
 
 }
