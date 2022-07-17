@@ -13,7 +13,7 @@ public interface PInterventorRepository extends MongoRepository<ProyectosInterve
 
 	@RestResource(path = "exist-user")
 	public Boolean existsByIdProyecto(@Param("idProyecto") Integer idProyecto);
-	
-	@RestResource(path = "exist-user")
+
+	@RestResource(path = "delete-user")
 	public Boolean deleteByIdProyecto(@Param("idProyecto") Integer idProyecto);
 }
