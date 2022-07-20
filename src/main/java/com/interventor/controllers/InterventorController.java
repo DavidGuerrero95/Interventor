@@ -120,7 +120,7 @@ public class InterventorController {
 		throw new IOException("Error en la eliminacion de peticion proyecto");
 	}
 
-	@DeleteMapping("	")
+	@DeleteMapping("/interventor/eliminarProyectoDefinitivamente/")
 	public Boolean eliminarProyectos(@RequestParam("codigoProyecto") Integer codigoProyecto) {
 		ProyectosInterventor pInter = pRepository.findByIdProyecto(codigoProyecto);
 		pRepository.delete(pInter);
